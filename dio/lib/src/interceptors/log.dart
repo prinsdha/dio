@@ -10,6 +10,7 @@ import '../response.dart';
 class LogInterceptor extends Interceptor {
   LogInterceptor({
     this.request = true,
+    this.isDebugMode = true,
     this.requestHeader = true,
     this.requestBody = false,
     this.responseHeader = true,
@@ -36,6 +37,8 @@ class LogInterceptor extends Interceptor {
   /// Print error message
   bool error;
 
+  bool isDebugMode;
+
   /// Log printer; defaults print log to console.
   /// In flutter, you'd better use debugPrint.
   /// you can also write log in a file, for example:
@@ -51,7 +54,9 @@ class LogInterceptor extends Interceptor {
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    logPrint('*** Request ***');
+    if (isDebugMode) {
+      logPrint('*** Request ***');
+    }
     _printKV('uri', options.uri);
     //options.headers;
 
@@ -74,14 +79,14 @@ class LogInterceptor extends Interceptor {
       logPrint('data:');
       _printAll(options.data);
     }
-    logPrint('');
-
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) async {
-    logPrint('*** Response ***');
+    if (isDebugMode) {
+      logPrint('*** Response ***');
+    }
     _printResponse(response);
     handler.next(response);
   }
@@ -116,14 +121,17 @@ class LogInterceptor extends Interceptor {
       logPrint('Response Text:');
       _printAll(response.toString());
     }
-    logPrint('');
   }
 
   void _printKV(String key, Object? v) {
-    logPrint('$key: $v');
+    if (isDebugMode) {
+      logPrint('$key: $v');
+    }
   }
 
   void _printAll(msg) {
-    msg.toString().split('\n').forEach(logPrint);
+    if (isDebugMode) {
+      msg.toString().split('\n').forEach(logPrint);
+    }
   }
 }
